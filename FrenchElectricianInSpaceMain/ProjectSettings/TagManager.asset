@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Ground
+  - GroundTrigger
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -38,6 +41,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 1981586101
+    locked: 0
+  - name: Stars
+    uniqueID: 3473076407
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
