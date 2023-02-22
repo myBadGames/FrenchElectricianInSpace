@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine; 
 
 public class EnemyControl : MonoBehaviour
 {
     [SerializeField] private float movingSpeed;
     [SerializeField] private float direction;
+   
 
     void Start()
     {
