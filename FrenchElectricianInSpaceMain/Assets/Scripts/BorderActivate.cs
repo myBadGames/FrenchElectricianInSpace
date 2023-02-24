@@ -4,19 +4,35 @@ using UnityEngine;
 
 public class BorderActivate : MonoBehaviour
 {
-    private BoxCollider2D col;
+    [SerializeField] private GameObject border;
+    private BoxCollider2D borderCollider;
 
     void Start()
     {
-        col = GetComponent<BoxCollider2D>();
-        col.isTrigger = true;
+        borderCollider = border.GetComponent<BoxCollider2D>();
     }
+
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if(collision.gameObject.name == "Player")
+        Debug.Log("activate border");
+
+        if (collision.gameObject.CompareTag("Player"))
         {
-            col.isTrigger = false;
+            float horizontal = collision.gameObject.GetComponent<PlayerController>().horizontalInput;
+
+            if(gameObject.name.Contains("Camera"))
+            {
+                if (horizontal > 0)
+                {
+                    borderCollider.isTrigger = false;
+                }
+            }
+
+            if(gameObject.name.Contains("Next"))
+            {
+                borderCollider.isTrigger = true;
+            }
         }
     }
 }

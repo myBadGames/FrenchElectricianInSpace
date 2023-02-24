@@ -9,6 +9,9 @@ TagManager:
   - Enemy
   - BackHalf
   - NextArea
+  - Background
+  - BackgroundCurrent
+  - Border
   layers:
   - Default
   - TransparentFX

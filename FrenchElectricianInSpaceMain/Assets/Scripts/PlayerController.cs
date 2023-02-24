@@ -6,7 +6,7 @@ using Cinemachine;
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody2D playerRb;
-    [SerializeField] private float horizontalInput;
+    public float horizontalInput;
     [SerializeField] private float movingSpeed;
     [SerializeField] private float velocity;
     [SerializeField] private bool jumpBool;
@@ -21,42 +21,62 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float direction;
 
     [SerializeField] private float gravityMod;
+
+    private PlayerGroundCheck groundCheck;
+
     public float spawnOffset;
     public GameObject background;
+    public GameObject playerHolder;
+    public Vector3 origin;
+    public float camShiftDuration;
 
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
+        groundCheck = GetComponentInChildren<PlayerGroundCheck>();
         Physics2D.gravity *= gravityMod;
+        origin = GameObject.Find("BackgroundFirst").transform.position;
     }
 
     void Update()
     {
-        //Debug.Log(Physics2D.gravity);
+       // Debug.Log(transform.position.x);
         PlayerInput();
 
         var composer = cineCam.GetCinemachineComponent<CinemachineFramingTransposer>();
 
         if (inTheBack)
         {
-             composer.m_DeadZoneWidth = 1;
+            composer.m_DeadZoneWidth = 1;
         }
         else
         {
-            composer.m_DeadZoneWidth = 0.1f;
+            if (composer.m_DeadZoneWidth > 0f)
+            {
+                composer.m_DeadZoneWidth -= Time.deltaTime / camShiftDuration;
+            }
         }
-
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
             direction = horizontalInput;
         }
 
-
-        if(Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            Instantiate(background, transform.position + new Vector3(spawnOffset,0), background.transform.rotation);
+            Instantiate(background, GameObject.Find("BackgroundFirst").transform.position + new Vector3(spawnOffset, 0), background.transform.rotation);
             Debug.Log("Instantiate");
+        }
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            GameObject doomed = GameObject.FindGameObjectWithTag("Background");
+
+            Destroy(doomed);
+        }
+
+        if(Input.GetKeyDown(KeyCode.U))
+        {
+            StartCoroutine(Move());
         }
     }
 
@@ -106,12 +126,9 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") && groundCheck.occupiedGround)
         {
-            if(!isOnGround)
-            {
-                isOnGround = true;
-            }
+            isOnGround = true;
         }
     }
 
@@ -128,7 +145,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("BackHalf"))
         {
-            if(horizontalInput < 0)
+            if (horizontalInput < 0)
             {
                 inTheBack = true;
             }
@@ -142,5 +159,15 @@ public class PlayerController : MonoBehaviour
     void Die()
     {
         Debug.Log("Death");
+    }
+
+    IEnumerator Move()
+    {
+        yield return new WaitForSeconds(Random.Range(2.5f, 5.5f));
+        Debug.Log("Move");
+        gameObject.transform.SetParent(playerHolder.transform);
+        playerHolder.transform.position = new Vector2(0, 0);
+        gameObject.transform.parent = null;
+        playerHolder.GetComponent<GoBack>().GoBackToFront();
     }
 }
